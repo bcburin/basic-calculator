@@ -39,7 +39,7 @@ let displayedResult = false;
 const appendDisplay = function (input) {
   if (displayText === "0") displayText = "";
   if (displayedResult) {
-    displayText = "";
+    if (!(input.symbol in operators)) displayText = "";
     displayedResult = false;
   }
   displayText += input.symbol;
@@ -66,6 +66,7 @@ clear.btn.addEventListener("click", function () {
 });
 
 result.btn.addEventListener("click", function () {
-  display.textContent = calculateExpression(displayText);
+  displayText = calculateExpression(displayText);
+  display.textContent = displayText;
   displayedResult = true;
 });
