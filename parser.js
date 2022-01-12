@@ -20,10 +20,10 @@ function parseString(str) {
   let components = [];
 
   for (let i = 0; i < str.length; ) {
-    if (str[i] in digits) {
+    if (digits.includes(str[i])) {
       // push new number component
       let number = "";
-      while (str[i] in digits) {
+      while (digits.includes(str[i])) {
         number += str[i++];
       }
       components.push(new lexicalComponent(Number(number), "num"));
@@ -102,6 +102,9 @@ function calculateExpression(str) {
           case "/":
             result = n1 / n2;
             break;
+          default:
+            console.log("unsupported operator");
+            return null;
         }
 
         // allocate result on stack
