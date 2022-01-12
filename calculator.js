@@ -89,13 +89,13 @@ function postOrderCalculation(head) {
         calcStack.push(calcStack.pop() + calcStack.pop());
         break;
       case "-":
-        calcStack.push(calcStack.pop() - calcStack.pop());
+        calcStack.push(-calcStack.pop() + calcStack.pop());
         break;
       case "*":
         calcStack.push(calcStack.pop() * calcStack.pop());
         break;
       case "/":
-        calcStack.push(calcStack.pop() / calcStack.pop());
+        calcStack.push((1 / calcStack.pop()) * calcStack.pop());
         break;
       default:
         break;
