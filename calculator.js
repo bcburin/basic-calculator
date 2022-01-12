@@ -34,10 +34,16 @@ const display = document.querySelector(".c-displayBox__text");
 /* Global variable declarations */
 
 let displayText = "0";
+let displayedResult = false;
 
-const appendDisplay = function (ipnut) {
+const appendDisplay = function (input) {
   if (displayText === "0") displayText = "";
-  displayText += ipnut.symbol;
+  if (displayedResult) {
+    displayText = "";
+    displayedResult = false;
+    calcStack = [];
+  }
+  displayText += input.symbol;
   display.textContent = displayText;
 };
 
@@ -60,4 +66,41 @@ clear.btn.addEventListener("click", function () {
   display.textContent = displayText;
 });
 
-result.btn.addEventListener("click", function () {});
+result.btn.addEventListener("click", function () {
+  const calcTree = stringToBinaryTree(displayText);
+  postOrderCalculation(calcTree.head);
+  display.textContent = calcStack[0];
+  displayedResult = true;
+});
+
+/* Calculate result from calculation tree */
+
+let calcStack = [];
+
+function postOrderCalculation(head) {
+  if (head === null) return;
+
+  postOrderCalculation(head.left);
+  postOrderCalculation(head.right);
+
+  if (head.content in operators) {
+    switch (head.content) {
+      case "+":
+        calcStack.push(calcStack.pop() + calcStack.pop());
+        break;
+      case "-":
+        calcStack.push(calcStack.pop() - calcStack.pop());
+        break;
+      case "*":
+        calcStack.push(calcStack.pop() * calcStack.pop());
+        break;
+      case "/":
+        calcStack.push(calcStack.pop() / calcStack.pop());
+        break;
+      default:
+        break;
+    }
+  } else {
+    calcStack.push(Number(head.content));
+  }
+}
