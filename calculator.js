@@ -71,6 +71,7 @@ result.btn.addEventListener("click", function () {
   postOrderCalculation(calcTree.head);
   display.textContent = calcStack[0];
   displayedResult = true;
+  printPostOrder(calcTree.head);
 });
 
 /* Calculate result from calculation tree */
