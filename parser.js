@@ -19,6 +19,8 @@ function lexicalComponent(content = null, type = null) {
 function parseString(str) {
   let components = [];
 
+  if (str[0] === "-") str = "(0-" + str[1] + ")" + str.slice(2); // first number is negative
+
   for (let i = 0; i < str.length; ) {
     if (digits.includes(str[i])) {
       // push new number component
