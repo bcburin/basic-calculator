@@ -1,23 +1,32 @@
-/* Implementing lexical components */
+// Determine valid operators and their relative priorities
+const operators = {
+  "+": 0,
+  "-": 1,
+  "*": 2,
+  "/": 3,
+};
 
+// Determine valid digits
+const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
+
+/* Implement lexical components of an expression */
 function lexicalComponent(content = null, type = null) {
   this.content = content;
   this.type = type;
 }
 
-/* Conversion Functions */
-
-function stringToLexicalComponents(str) {
+/* Parse input string and return array containing lexical components post-oredered */
+function parseString(str) {
   let components = [];
-  i = 0;
-  while (i < str.length) {
+
+  for (let i = 0; i < str.length; ) {
     if (str[i] in digits) {
       // push new number component
       let number = "";
       while (str[i] in digits) {
         number += str[i++];
       }
-      components.push(new lexicalComponent(number, "num"));
+      components.push(new lexicalComponent(Number(number), "num"));
     } else if (str[i] in operators) {
       // push new operator component
       let operator = str[i++];
@@ -32,83 +41,74 @@ function stringToLexicalComponents(str) {
       i++;
     }
   }
-  return components;
+  // reorder array in post-order and return
+  return toPostOrder(components);
 }
 
-function componentToNode(component) {
-  switch (component.type) {
-    case "num":
-    case "op":
-      return new Node(component.content);
-    case "exp":
-      console.log("exp");
-      return stringToBinaryTree(component.content).head;
-    default:
-      return null;
-  }
-}
+/* Implement post-ordering for raw component array */
 
-/* Implementing syntax parser */
-
-// Contains valid operators and their respective priorities
-const operators = {
-  "+": 0,
-  "-": 1,
-  "*": 2,
-  "/": 3,
-};
-
-// Contains valid digits
-const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
-
-function stringToBinaryTree(str) {
-  const component = stringToLexicalComponents(str);
-
-  let btree = new BinaryTree();
-  let leftNode = null;
-  let rightNode = null;
-  let opNode = null;
-
-  function adoptLeftInsert() {
-    attachNodes(opNode, leftNode, rightNode);
-    btree.head = opNode;
-    leftNode = opNode;
-  }
-
-  function stealRightInsert() {
-    attachNodes(opNode, leftNode.right, rightNode); // steal right node of former operator
-    opNode.parent = leftNode;
-    leftNode.right = opNode;
-    leftNode = opNode;
-  }
-
-  leftNode = componentToNode(component[0]);
-
-  for (let i = 1; i < component.length; i += 2) {
-    opNode = componentToNode(component[i]);
-    rightNode = componentToNode(component[i + 1]);
-
-    if (!(leftNode.content in operators)) {
-      adoptLeftInsert();
-    } else if (operators[opNode.content] >= operators[leftNode.content]) {
-      stealRightInsert();
-    } else {
-      while (
-        operators[opNode.content] < operators[leftNode.content] &&
-        leftNode.parent !== null
+function toPostOrder(components) {
+  for (let i = 0; i < components.length; i++) {
+    if (components[i].type === "op") {
+      for (
+        let j = i;
+        j < components.length - 1 &&
+        (components[j + 1].type !== "op" ||
+          operators[components[j].content] <
+            operators[components[j + 1].content]);
+        j++
       ) {
-        leftNode = leftNode.parent;
-      }
-      if (operators[opNode.content] >= operators[leftNode.content]) {
-        stealRightInsert();
-      } else {
-        adoptLeftInsert();
+        //shift operator to the right
+        let temp = components[j];
+        components[j] = components[j + 1];
+        components[j + 1] = temp;
       }
     }
   }
-  return btree;
+  return components;
 }
 
-// btree = stringToBinaryTree("(3+4)*2+1");
-// // console.log("head:" + btree.head.content);
-// printPostOrder(btree.head);
+/* Given a string containing a expression, return its calculated value */
+function calculateExpression(str) {
+  let components = parseString(str);
+  let stack = [];
+
+  for (let i = 0; i < components.length; i++) {
+    let component = components[i];
+    switch (component.type) {
+      case "num":
+        stack.push(component.content);
+        break;
+      case "exp":
+        stack.push(calculateExpression(component.content));
+        break;
+      case "op":
+        // retrieve last two items from stack
+        let n2 = stack.pop();
+        let n1 = stack.pop();
+        let result;
+
+        // make correspondent calculation
+        switch (component.content) {
+          case "+":
+            result = n1 + n2;
+            break;
+          case "-":
+            result = n1 - n2;
+            break;
+          case "*":
+            result = n1 * n2;
+            break;
+          case "/":
+            result = n1 / n2;
+            break;
+        }
+
+        // allocate result on stack
+        stack.push(result);
+
+        break;
+    }
+  }
+  return stack[0];
+}
