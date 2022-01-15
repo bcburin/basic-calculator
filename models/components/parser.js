@@ -1,21 +1,8 @@
 "use strict";
 
-// Determine valid operators and their relative priorities
-const operators = {
-  "+": 0,
-  "-": 1,
-  "*": 2,
-  "/": 3,
-};
-
-// Determine valid digits
-const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
-
-/* Implement lexical components of an expression */
-function lexicalComponent(content = null, type = null) {
-  this.content = content;
-  this.type = type;
-}
+import LexicalComponent from "./lexical-component.js";
+import { digits } from "./calculator-key.js";
+import { operators } from "./calculator-key.js";
 
 /* Parse input string and return array containing lexical components post-oredered */
 function parseString(str) {
@@ -24,17 +11,17 @@ function parseString(str) {
   if (str[0] === "-") str = "(0-" + str[1] + ")" + str.slice(2); // first number is negative
 
   for (let i = 0; i < str.length; ) {
-    if (digits.includes(str[i])) {
+    if (digits.has(str[i])) {
       // push new number component
       let number = "";
-      while (digits.includes(str[i])) {
+      while (digits.has(str[i])) {
         number += str[i++];
       }
-      components.push(new lexicalComponent(Number(number), "num"));
+      components.push(new LexicalComponent(Number(number), "num"));
     } else if (str[i] in operators) {
       // push new operator component
       let operator = str[i++];
-      components.push(new lexicalComponent(operator, "op"));
+      components.push(new LexicalComponent(operator, "op"));
     } else if (str[i] === "(") {
       // push new expression component
       let expression = "";
@@ -47,7 +34,7 @@ function parseString(str) {
         i++;
       } while (braCount !== 0);
       expression = expression.slice(1, -1);
-      components.push(new lexicalComponent(expression, "exp"));
+      components.push(new LexicalComponent(expression, "exp"));
       i++;
     }
   }
@@ -125,3 +112,5 @@ function calculateExpression(str) {
   }
   return stack[0];
 }
+
+export default calculateExpression;

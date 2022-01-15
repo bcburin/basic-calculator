@@ -1,0 +1,87 @@
+import calculateExpression from "./parser.js";
+
+// Determine valid operators and their relative priorities
+export const operators = {
+  "+": 0,
+  "-": 1,
+  "*": 2,
+  "/": 3,
+};
+
+// Determine valid digits
+export const digits = new Set([
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  ".",
+]);
+
+// Find the display element over which the calculator key will act
+const display = document.querySelector(".c-displayBox__text");
+
+// Store the information of whether the result has already been displayed
+let displayedResult = false;
+
+class CalculatorKey {
+  constructor(selector) {
+    const self = this;
+
+    // Find element
+    self.element = document.querySelector(selector);
+
+    // Get the key type based on its content
+    const content = self.element.textContent;
+    if (digits.has(content)) {
+      self.type = "digit";
+    } else if (content in operators) {
+      self.type = "operator";
+    } else if (content === "(" || content === ")") {
+      self.type = "bracket";
+    } else if (content === "AC") {
+      self.type = "clear";
+    } else if (content === "=") {
+      self.type = "result";
+    }
+
+    // Add event listener
+    switch (self.type) {
+      case "digit":
+      case "bracket":
+      case "operator":
+        self.element.addEventListener("click", self.appendDisplay.bind(self));
+        break;
+      case "clear":
+        self.element.addEventListener("click", self.clearDisplay);
+        break;
+      case "result":
+        self.element.addEventListener("click", self.resultDisplay);
+    }
+  }
+
+  appendDisplay() {
+    if (display.textContent === "0") display.textContent = "";
+    if (displayedResult) {
+      if (this.type !== "operator") display.textContent = "";
+      displayedResult = false;
+    }
+    display.textContent += this.element.textContent;
+  }
+
+  clearDisplay() {
+    display.textContent = "0";
+  }
+
+  resultDisplay() {
+    display.textContent = calculateExpression(display.textContent);
+    displayedResult = true;
+  }
+}
+
+export default CalculatorKey;
