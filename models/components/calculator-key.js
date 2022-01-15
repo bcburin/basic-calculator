@@ -55,14 +55,15 @@ class CalculatorKey {
       case "digit":
       case "bracket":
       case "operator":
-        self.element.addEventListener("click", self.appendDisplay.bind(self));
+        self.defaultAction = self.appendDisplay.bind(self);
         break;
       case "clear":
-        self.element.addEventListener("click", self.clearDisplay);
+        self.defaultAction = self.clearDisplay.bind(self);
         break;
       case "result":
-        self.element.addEventListener("click", self.resultDisplay);
+        self.defaultAction = self.resultDisplay.bind(self);
     }
+    self.element.addEventListener("click", self.defaultAction);
   }
 
   appendDisplay() {
