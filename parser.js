@@ -1,3 +1,5 @@
+"use strict";
+
 // Determine valid operators and their relative priorities
 const operators = {
   "+": 0,
@@ -36,9 +38,15 @@ function parseString(str) {
     } else if (str[i] === "(") {
       // push new expression component
       let expression = "";
-      while (str[++i] !== ")") {
+      let braCount = 0;
+      do {
+        if (str[i] === "(") braCount++;
+        if (str[i] === ")") braCount--;
         expression += str[i];
-      }
+
+        i++;
+      } while (braCount !== 0);
+      expression = expression.slice(1, -1);
       components.push(new lexicalComponent(expression, "exp"));
       i++;
     }
