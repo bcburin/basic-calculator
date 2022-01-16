@@ -26,9 +26,11 @@ const multiply = new CalculatorKey(".c-btn--multiplication");
 const divide = new CalculatorKey(".c-btn--division");
 const result = new CalculatorKey(".c-btn--result");
 const clear = new CalculatorKey(".c-btn--clear");
+const del = new CalculatorKey(".c-btn--delete");
 
 document.addEventListener("keydown", function (event) {
   const key = event.key;
+  console.log(key);
 
   switch (key) {
     case "+":
@@ -61,6 +63,9 @@ document.addEventListener("keydown", function (event) {
     case ".":
     case ",":
       dot.defaultAction();
+    case "Backspace":
+      del.defaultAction();
+      break;
     default:
       for (const [i, number] of numbers.entries()) {
         if (Number(key) === i) {

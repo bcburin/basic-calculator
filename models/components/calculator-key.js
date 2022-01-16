@@ -48,8 +48,9 @@ class CalculatorKey {
       self.type = "clear";
     } else if (content === "=") {
       self.type = "result";
+    } else if (content === "⬅") {
+      self.type = "delete";
     }
-
     // Add event listener
     switch (self.type) {
       case "digit":
@@ -62,6 +63,9 @@ class CalculatorKey {
         break;
       case "result":
         self.defaultAction = self.resultDisplay.bind(self);
+        break;
+      case "delete":
+        self.defaultAction = self.deleteDisplay.bind(self);
     }
     self.element.addEventListener("click", self.defaultAction);
   }
@@ -82,6 +86,15 @@ class CalculatorKey {
   resultDisplay() {
     display.textContent = calculateExpression(display.textContent);
     displayedResult = true;
+  }
+
+  deleteDisplay() {
+    if (display.textContent === "0") return;
+    if (display.textContent.length === 1) {
+      display.textContent = "0";
+      return;
+    }
+    display.textContent = display.textContent.slice(0, -1);
   }
 }
 
